@@ -23,7 +23,7 @@ brew install docker
 ```
 
 ### On Windows
-Just download the Git and Docker executables from the requirements links above and use Git bash for the following commands. 
+Just download the Git and Docker executables from the requirements links above and use the included "Git BASH" to run the following commands. 
 
 ## Running
 Download the **dacsite** repository from GitHub.
