@@ -6,7 +6,7 @@ This is a repo for a storing a new WordPress installation for the SIGGRAPH DAC. 
 - [Git](https://git-scm.com/)
 - [Docker](https://git-scm.com/)
 
-### On a Mac
+### On Mac
 Install Homebrew: 
 ```bash
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -21,6 +21,9 @@ Install Docker
 ```bash
 brew install docker
 ```
+
+### On Windows
+Just download the Git and Docker executables from the requirements links above and use Git bash for the following commands. 
 
 ## Running
 Download the **dacsite** repository from GitHub.
