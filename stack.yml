@@ -1,22 +1,27 @@
 version: '3.1'
 
 services:
-  mysql:
-    image: mysql:5.7
-    volumes:
-      - ./db_data:/var/lib/mysql
-    ports:
-      - 3306:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: example
+
   wordpress:
-    depends_on:
-      - mysql
-    image: wordpress
+    image: wordpress:5.2
     volumes:
-      - ./wp_data:/var/www/html
+      - wp_data:/var/www/html
       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini 
+      - ./wp-content:/var/www/html/wp-content
     ports:
       - 8080:80
     environment:
       WORDPRESS_DB_PASSWORD: example
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+
+volumes:
+  db_data:
+  wp_data:

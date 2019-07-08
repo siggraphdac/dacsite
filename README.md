@@ -59,3 +59,29 @@ code .
 ```
 
 The theme and plugins used are under the wp-content in the wp_data directory.
+
+## Upgrading or Modifying the Stack
+If you are updating the Wordpress stack file volume settings run:
+
+```bash
+docker service rm dacsite_wordpress && docker volume rm dacsite_wp_data && docker stack deploy dacsite -c stack.yml
+```
+
+If you are upgrading or modifying the Wordpress or MySQL do the following to completely rebuild the stack:
+
+- `docker service rm dacsite_mysql`
+- `docker service rm dacsite_wordpress`
+- `docker volume rm dacsite_db_data`
+- `docker volume rm dacsite_wp_data`
+- `docker stack deploy dacsite -c stack.yml`
+
+Or all in one command:
+
+```bash
+docker swarm leave --force && docker volume rm dacsite_db_data && docker volume rm dacsite_wp_data && docker swarm init && docker stack deploy dacsite -c stack.yml
+```
+
+## Troubleshooting
+On a Mac, to see what what files exist within a volume use the following to start up a new container and mount the volumes folder from the Docker Virtual Machine.
+
+`docker run --rm -it -v /var/lib/docker/volumes:/docker -w="/docker" alpine:latest sh`
