@@ -7,6 +7,15 @@
  * @package DAC
  */
 
+function console_log($output, $with_script_tags = true) {
+    $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) . 
+');';
+    if ($with_script_tags) {
+        $js_code = '<script>' . $js_code . '</script>';
+    }
+    echo $js_code;
+}
+
 if ( ! function_exists( 'dac_setup' ) ) :
 	/**
 	 * Sets up theme defaults and registers support for various WordPress features.
@@ -85,6 +94,29 @@ if ( ! function_exists( 'dac_setup' ) ) :
 endif;
 add_action( 'after_setup_theme', 'dac_setup' );
 
+function embed_posts_shortcode() {
+	$args = array(
+		'post_type'              => array( 'post' ),
+	);
+
+	// The Query
+	$the_query = new WP_Query( $args );
+
+	// The Loop
+	if ( $the_query->have_posts() ) {
+		while ( $the_query->have_posts() ) {
+			$the_query->the_post();
+			get_template_part( 'template-parts/content', get_post_type() );
+		}
+	} else {
+	// no posts found
+	}
+
+	/* Restore original Post Data */
+	wp_reset_postdata();
+		
+}
+add_shortcode('embed_posts', 'embed_posts_shortcode');
 
 function add_google_fonts() {
 	wp_enqueue_style('add_google_fonts', 'https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i', false );

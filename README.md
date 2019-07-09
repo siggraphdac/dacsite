@@ -72,16 +72,20 @@ If you are upgrading or modifying the Wordpress or MySQL do the following to com
 - `docker service rm dacsite_mysql`
 - `docker service rm dacsite_wordpress`
 - `docker volume rm dacsite_db_data`
-- `docker volume rm dacsite_wp_data`
+- `rm -rf wp_data/*`
 - `docker stack deploy dacsite -c stack.yml`
 
 Or all in one command:
 
 ```bash
-docker swarm leave --force && docker volume prune && docker swarm init && docker stack deploy dacsite -c stack.yml
+docker swarm leave --force && rm -rf wp_data/* && docker volume prune && docker swarm init && docker stack deploy dacsite -c stack.yml
 ```
 
 ## Troubleshooting
 On a Mac, to see what what files exist within a volume use the following to start up a new container and mount the volumes folder from the Docker Virtual Machine.
 
 `docker run --rm -it -v /var/lib/docker/volumes:/docker -w="/docker" alpine:latest sh`
+
+Enable debugging for wordpress:
+
+`define( 'WP_DEBUG', true );`

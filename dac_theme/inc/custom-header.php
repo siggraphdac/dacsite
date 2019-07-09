@@ -18,7 +18,7 @@
  */
 function dac_custom_header_setup() {
 	add_theme_support( 'custom-header', apply_filters( 'dac_custom_header_args', array(
-		'default-image'          => '',
+		'default-image'          => '/assets/images/header.jpg',
 		'default-text-color'     => '000000',
 		'width'                  => 1000,
 		'height'                 => 250,

@@ -985,5 +985,66 @@ object {
 }
 
 /*--------------------------------------------------------------
+# Misc
+--------------------------------------------------------------*/
+
+.site-description {
+	display: none;
+}
+
+.site-title {
+	display: none;
+}
+
+.main-navigation {
+	border: 2px solid #0070B8;
+	padding: 10px;
+}
+
+.page_item{
+	padding-right: 10px;
+	box-sizing: border-box;
+	margin: 5px;
+}
+
+.page_item a:link {
+	color: #43484C;
+	font-weight: bold;
+	/* padding-bottom: 6px; */
+}
+
+.page_item a:hover {
+	box-shadow: 0 5px 0px 0px #B23B96;
+}
+
+.site-footer {
+	text-align: center;
+	padding-top: 25px;
+	padding-left: 25px;
+	background-color: #E2E2E2;
+}
+
+.site-footer img{
+	padding-left: 25px;
+}
+
+/*--------------------------------------------------------------
 # Layout
 --------------------------------------------------------------*/
+.site {
+	margin-top: 10px;
+	display: grid;
+	justify-items: center;
+}
+
+.site-header {
+	width: 50%;
+}
+
+.site-content {
+	width: 50%;
+}
+
+.site-footer {
+	width: 50%;
+}
