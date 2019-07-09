@@ -85,6 +85,13 @@ if ( ! function_exists( 'dac_setup' ) ) :
 endif;
 add_action( 'after_setup_theme', 'dac_setup' );
 
+
+function add_google_fonts() {
+	wp_enqueue_style('add_google_fonts', 'https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i', false );
+}
+
+add_action('wp_enqueue_scripts', 'add_google_fonts');
+
 /**
  * Set the content width in pixels, based on the theme's design and stylesheet.
  *
@@ -120,6 +127,7 @@ function dac_widgets_init() {
 	unregister_widget('WP_Widget_Archives');
 	unregister_widget('WP_Widget_Categories');
 	unregister_widget('WP_Widget_Meta');
+	unregister_widget('WP_Widget_Search');
 }
 add_action( 'widgets_init', 'dac_widgets_init' );
 

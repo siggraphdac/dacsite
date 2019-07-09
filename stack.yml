@@ -5,9 +5,9 @@ services:
   wordpress:
     image: wordpress:5.2
     volumes:
-      - wp_data:/var/www/html
+      - ./wp_data:/var/www/html
       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini 
-      - ./wp-content:/var/www/html/wp-content
+      - ./dac_theme:/var/www/html/wp-content/themes/dac_theme
     ports:
       - 8080:80
     environment:
@@ -24,4 +24,3 @@ services:
 
 volumes:
   db_data:
-  wp_data:

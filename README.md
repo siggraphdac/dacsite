@@ -78,7 +78,7 @@ If you are upgrading or modifying the Wordpress or MySQL do the following to com
 Or all in one command:
 
 ```bash
-docker swarm leave --force && docker volume rm dacsite_db_data && docker volume rm dacsite_wp_data && docker swarm init && docker stack deploy dacsite -c stack.yml
+docker swarm leave --force && docker volume prune && docker swarm init && docker stack deploy dacsite -c stack.yml
 ```
 
 ## Troubleshooting
