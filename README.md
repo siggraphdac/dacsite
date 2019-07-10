@@ -73,7 +73,7 @@ If you are upgrading or modifying the Wordpress or MySQL do the following to com
 - `docker service rm dacsite_wordpress`
 - `docker volume rm dacsite_db_data`
 - `rm -rf wp_data/*`
-- `docker stack deploy dacsite -c stack.yml`
+- `docker stack deploy dacsite -c stack.yml --with-registry-auth`
 
 Or all in one command:
 
