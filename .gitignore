@@ -1,6 +1,5 @@
 wp_data/*
 wp_data/wp-content/*
-!wp_data/.gitkeep
 
 wp_data/wp-content/plugins/*
 !wp_data/wp-content

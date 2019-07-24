@@ -54,9 +54,18 @@ if ( ! function_exists( 'dac_setup' ) ) :
 		add_theme_support( 'post-thumbnails' );
 
 		// This theme uses wp_nav_menu() in one location.
-		register_nav_menus( array(
-			'menu-1' => esc_html__( 'Primary', 'dac' ),
-		) );
+		register_nav_menu( 'primary', __( 'Primary Menu', 'dac' ) );
+		
+		
+
+		// register_nav_menus( array(
+		// 	'menu-1' => esc_html__( 'Primary', 'dac' ),
+		// ) );
+
+		// function register_my_menu() {
+		// 	register_nav_menu('header-menu',__( 'Header Menu' ));
+		// }
+		// add_action( 'init', 'register_my_menu' );
 
 		/*
 		 * Switch default core markup for search form, comment form, and comments
@@ -93,36 +102,6 @@ if ( ! function_exists( 'dac_setup' ) ) :
 	}
 endif;
 add_action( 'after_setup_theme', 'dac_setup' );
-
-function embed_posts_shortcode() {
-	$args = array(
-		'post_type'              => array( 'post' ),
-	);
-
-	// The Query
-	$the_query = new WP_Query( $args );
-
-	// The Loop
-	if ( $the_query->have_posts() ) {
-		while ( $the_query->have_posts() ) {
-			$the_query->the_post();
-			get_template_part( 'template-parts/content', get_post_type() );
-		}
-	} else {
-	// no posts found
-	}
-
-	/* Restore original Post Data */
-	wp_reset_postdata();
-		
-}
-add_shortcode('embed_posts', 'embed_posts_shortcode');
-
-function add_google_fonts() {
-	wp_enqueue_style('add_google_fonts', 'https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i', false );
-}
-
-add_action('wp_enqueue_scripts', 'add_google_fonts');
 
 /**
  * Set the content width in pixels, based on the theme's design and stylesheet.
@@ -173,6 +152,8 @@ function dac_scripts() {
 
 	wp_enqueue_script( 'dac-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
 
+	wp_enqueue_script( 'main', get_template_directory_uri() . '/js/main.js', array(), '20190710', true );
+
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
@@ -206,3 +187,77 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
 
+function embed_posts_shortcode() {
+	
+	// Buffer variable
+	$buffer='';
+
+	// Argumens fot the query
+	$args = array(
+		'post_type' => array( 'post' ),
+	);
+	// The Query
+	$the_query = new WP_Query( $args );
+	// The Loop
+	if ( $the_query->have_posts() ) {
+		while ( $the_query->have_posts() ) {
+			$the_query->the_post();
+			$buffer = '<h2 class="entry-title">'.$buffer.get_the_title().'</h2>';
+			$buffer = $buffer.get_the_content();
+			// get_template_part( 'template-parts/content', get_post_type() );
+		}
+	} else {
+	// no posts found
+	}
+	// Restore original Post Data
+	wp_reset_postdata();
+	
+	// Display the buffer
+	return $buffer;
+}
+add_shortcode('embed_posts', 'embed_posts_shortcode');
+
+function add_google_fonts() {
+	wp_enqueue_style('add_google_fonts', 'https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i', false );
+}
+
+add_action('wp_enqueue_scripts', 'add_google_fonts');
+
+
+// function register_my_menu() {
+//   register_nav_menu('header-menu',__( 'Header Menu' ));
+// }
+// add_action( 'init', 'register_my_menu' );
+
+
+// $menu_name = 'My First Menu';
+// $menu_exists = wp_get_nav_menu_object( $menu_name );
+
+// // If it doesn't exist, let's create it.
+// if( !$menu_exists){
+//     $menu_id = wp_create_nav_menu($menu_name);
+
+// 	// Set up default menu items
+//     wp_update_nav_menu_item($menu_id, 0, array(
+//         'menu-item-title' =>  __('Home'),
+//         'menu-item-classes' => 'home',
+//         'menu-item-url' => home_url( '/' ), 
+//         'menu-item-status' => 'publish'));
+
+//     wp_update_nav_menu_item($menu_id, 0, array(
+//         'menu-item-title' =>  __('Custom Page'),
+//         'menu-item-url' => home_url( '/custom/' ), 
+//         'menu-item-status' => 'publish'));
+
+// }
+
+// 		// This theme uses wp_nav_menu() in one location.
+// 		register_nav_menus( array(
+// 			'My First Menu' => esc_html__( 'Primary', 'dac' ),
+// 		) );
+
+/**
+ * Populate Wordpress with DAC starter content
+ */
+
+require get_template_directory() . '/inc/populate-content.php';

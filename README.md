@@ -51,6 +51,19 @@ docker stack deploy dacsite -c stack.yml
 
 Finally, you should be able to open a browser window and navigate to http://127.0.0.1:8080.
 
+Optionally, if you have docker-compose installed you can use: 
+
+```bash
+docker-compose -f stack.yml up -d
+```
+
+Then use the following helpful commands to manage.
+
+- `docker-compose down`
+- `docker-compse ps`
+- `docker-compose logs -f`
+
+
 ## Editing
 If you use Visual Studio Code you can run the following to open up a new session.
 
@@ -89,3 +102,30 @@ On a Mac, to see what what files exist within a volume use the following to star
 Enable debugging for wordpress:
 
 `define( 'WP_DEBUG', true );`
+
+## To Do 
+
+**Now**
+- [ ] add alternate colors of sections
+- [ ] add image slider to top
+- [ ] add display posts plugin
+- [ ] run on pre-publish server
+- [ ] add link to community page for Ning
+- [ ] add exhibition links
+- [ ] fix menu bar
+- [ ] create page template for top section so it doesn't show title
+
+**Soon**
+- [ ] add social media integration
+- [ ] add call for works calendar
+- [ ] add exhiition videos
+
+**Later**
+- [ ] add fully functioning community feature
+
+**Maybe**
+- [ ] add trailer video about the DAC
+
+**Done**
+- [x] create major elements
+- [x] create layout
