@@ -9,7 +9,7 @@
 
 ?>
 
-<article id="post-<?php the_title(); ?>" <?php post_class(); ?>>
+<article id="post-<?php echo $post->post_name ?>" <?php post_class(); ?>>
 	<header class="entry-header">
 		<?php 
 			if ( get_page_template_slug( get_the_ID() ) != "page-templates/page_no-title.php" ){

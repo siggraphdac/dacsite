@@ -105,27 +105,4 @@ Enable debugging for wordpress:
 
 ## To Do 
 
-**Now**
-- [ ] add alternate colors of sections
-- [ ] add image slider to top
-- [ ] add display posts plugin
-- [ ] run on pre-publish server
-- [ ] add link to community page for Ning
-- [ ] add exhibition links
-- [ ] fix menu bar
-- [ ] create page template for top section so it doesn't show title
-
-**Soon**
-- [ ] add social media integration
-- [ ] add call for works calendar
-- [ ] add exhiition videos
-
-**Later**
-- [ ] add fully functioning community feature
-
-**Maybe**
-- [ ] add trailer video about the DAC
-
-**Done**
-- [x] create major elements
-- [x] create layout
+See here: https://docs.google.com/document/d/1MGRi53u1CFQJFQCkJc3RUtYT83Rg7vH42fousrdK-c8

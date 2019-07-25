@@ -27,10 +27,11 @@
 	<header id="masthead" class="site-header">
 		<div class="site-branding">
 			<div class="header-image">
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>">
 				<?php 
 					// the_custom_logo();
 					the_header_image_tag(); 
-				?>
+				?></a>
 			</div>
 			<?php
 			if ( is_front_page() && is_home() ) :

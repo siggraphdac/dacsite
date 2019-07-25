@@ -1004,22 +1004,22 @@ object {
 	padding-bottom: 10px;
 }
 
-.menu-item {
+.menu-item, .page_item {
 	padding-right: 10px;
 	box-sizing: border-box;
 	margin: 5px;
 }
 
-.menu-item a:link {
+.menu-item a:link, .page_item a:link {
 	color: #43484C;
 	font-weight: bold;
 }
-.menu-item a:visited {
+.menu-item a:visited, .page_item a:visited {
 	color: #43484C;
 	box-shadow: 0 5px 0px 0px #B23B96;
 }
 
-.menu-item a:hover {
+.menu-item a:hover, .page_item a:hover {
 	box-shadow: 0 5px 0px 0px #B23B96;
 }
 
@@ -1036,6 +1036,10 @@ object {
 
 main.site-main>article.page:nth-of-type(even) {
 	background: #E2E2E2;
+}
+
+#colophon {
+	background-color: #fff;
 }
 
 .header-image {
@@ -1061,4 +1065,32 @@ main.site-main>article.page:nth-of-type(even) {
 
 .site-footer {
 	width: 50%;
+}
+
+header {
+	margin-bottom: 10px;
+}
+
+.ms-theme-architekt {
+	padding-bottom: 0px !important;
+}
+
+article p, article h1 {
+	padding-left: 30px;
+	padding-right: 30px;
+	/* padding-top: 10px;
+	padding-bottom: 10px; */
+}
+
+.entry-content {
+	margin-top: 0px;
+}
+
+.entry-content p {
+	margin-top: 0px;
+}
+
+.entry-header {
+	/* margin-block-start: 5px; */
+	padding-top: 1px;
 }

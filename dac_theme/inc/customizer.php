@@ -53,3 +53,41 @@ function dac_customize_preview_js() {
 	wp_enqueue_script( 'dac-customizer', get_template_directory_uri() . '/js/customizer.js', array( 'customize-preview' ), '20151215', true );
 }
 add_action( 'customize_preview_init', 'dac_customize_preview_js' );
+
+
+add_action( 'customize_register' , 'my_theme_options' );
+
+function my_theme_options( $wp_customize ) {
+	// Sections, settings and controls will be added here
+
+	$wp_customize->add_section( 
+		'dac_content_options', 
+		array(
+			'title'       => __( 'Populate Content', 'dac' ),
+			'priority'    => -100,
+			'capability'  => 'edit_theme_options',
+			'description' => __('Toggle the checkbox on to create content.', 'dac'), 
+		) 
+	);
+
+	$wp_customize->add_setting( 'pop_conent_toggle',
+		array(
+			'default' => 0
+		)
+	);    
+
+	$wp_customize->add_control( new WP_Customize_Control( 
+		$wp_customize, 
+		'pop_conent_toggle_control',
+		array(
+			'label'    => __( 'Do you want content?', 'dac' ), 
+			'section'  => 'dac_content_options',
+			'settings' => 'pop_conent_toggle',
+			'priority' => 10,
+			'type'           => 'checkbox'
+		) 
+	));
+
+}
+
+

@@ -7,16 +7,17 @@
  * @package DAC
  */
 
-function console_log($output, $with_script_tags = true) {
-    $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) . 
-');';
-    if ($with_script_tags) {
-        $js_code = '<script>' . $js_code . '</script>';
-    }
-    echo $js_code;
-}
-
 if ( ! function_exists( 'dac_setup' ) ) :
+
+	function console_log($output, $with_script_tags = true) {
+		$js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) . 
+	');';
+		if ($with_script_tags) {
+				$js_code = '<script>' . $js_code . '</script>';
+		}
+		echo $js_code;
+	}
+
 	/**
 	 * Sets up theme defaults and registers support for various WordPress features.
 	 *
@@ -223,41 +224,10 @@ function add_google_fonts() {
 
 add_action('wp_enqueue_scripts', 'add_google_fonts');
 
-
-// function register_my_menu() {
-//   register_nav_menu('header-menu',__( 'Header Menu' ));
-// }
-// add_action( 'init', 'register_my_menu' );
-
-
-// $menu_name = 'My First Menu';
-// $menu_exists = wp_get_nav_menu_object( $menu_name );
-
-// // If it doesn't exist, let's create it.
-// if( !$menu_exists){
-//     $menu_id = wp_create_nav_menu($menu_name);
-
-// 	// Set up default menu items
-//     wp_update_nav_menu_item($menu_id, 0, array(
-//         'menu-item-title' =>  __('Home'),
-//         'menu-item-classes' => 'home',
-//         'menu-item-url' => home_url( '/' ), 
-//         'menu-item-status' => 'publish'));
-
-//     wp_update_nav_menu_item($menu_id, 0, array(
-//         'menu-item-title' =>  __('Custom Page'),
-//         'menu-item-url' => home_url( '/custom/' ), 
-//         'menu-item-status' => 'publish'));
-
-// }
-
-// 		// This theme uses wp_nav_menu() in one location.
-// 		register_nav_menus( array(
-// 			'My First Menu' => esc_html__( 'Primary', 'dac' ),
-// 		) );
-
 /**
  * Populate Wordpress with DAC starter content
  */
 
-require get_template_directory() . '/inc/populate-content.php';
+// require get_template_directory() . '/inc/populate-content.php';
+
+
