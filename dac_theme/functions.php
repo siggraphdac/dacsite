@@ -190,28 +190,30 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 
 add_shortcode('show_categories', 'show_categories_shortcode');
 
-function show_categories_shortcode() {
+function show_categories_shortcode($atts) {
+
+	extract(shortcode_atts(array(
+		'category_slug' => 'announcements',
+	), $atts));
 
 	$buffer = "<div class='category-list'><ul>";
 
-	$catSlug = "announcement";
+	$catID = get_category_by_slug( $category_slug )->cat_ID;
 
-	BugFu::Log(get_category_by_slug( $catSlug )->cat_ID);
+	$catName = get_category_by_slug( $category_slug )->cat_name;
 
 	$categories = get_categories( array(
     'orderby' => 'name',
-    'child_of'  => get_category_by_slug( $catSlug )->cat_ID
+    'parent'  => $catID
 	));
 
-	BugFu::Log($categories);
+	$buffer = $buffer.'<li><a href="' . get_category_link( $catID ) . '">' .  "All" . '</a></li>';
  
 	foreach ( $categories as $category ) {
 		$buffer = $buffer.'<li><a href="' . get_category_link( $category->term_id ) . '">' .  $category->name . '</a></li>';
 	}
 
 	$buffer = $buffer."</ul></div>";
-
-	BugFu::Log($buffer);
 
 	return $buffer;
 }
