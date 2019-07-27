@@ -15,7 +15,7 @@
 
 	<footer id="colophon" class="site-footer">
 		<div class="site-info">
-			<img width="200px" src="<?php bloginfo('stylesheet_directory'); ?>/assets/images/dac_logo.png">
+			<img width="200px" src="<?php bloginfo('stylesheet_directory'); ?>/assets/images/dac_logo_blue.png">
 			<img width="200px" src="<?php bloginfo('stylesheet_directory'); ?>/assets/images/sig_logo.png">
 		</div><!-- .site-info -->
 	</footer><!-- #colophon -->

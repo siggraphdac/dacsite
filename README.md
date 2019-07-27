@@ -1,6 +1,14 @@
 # New DAC Site
 This is a repo for a storing a new WordPress installation for the SIGGRAPH DAC. The wp_data and db_data allows for persistent storage. Most importantly, the WordPress theme used here is located in **wp_data/wp-content/themes/dacsite**.
 
+## Theme Setup
+The theme assumes a few things to get started:
+- A "homepage" with all of your content.
+- Settings > Reading > Your hompage displays > a "homepage"
+- The content on your homepage seperated with H1 tages. Each with an attached anchor link.
+- A custom menu made referencing the anchor links to navigate to your H1 tags.
+- Choose the "No Title" page template to hide the title.
+
 ## Requirements
 
 - [Git](https://git-scm.com/)

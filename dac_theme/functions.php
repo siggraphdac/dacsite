@@ -188,6 +188,34 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
 
+add_shortcode('show_categories', 'show_categories_shortcode');
+
+function show_categories_shortcode() {
+
+	$buffer = "<div class='category-list'><ul>";
+
+	$catSlug = "announcement";
+
+	BugFu::Log(get_category_by_slug( $catSlug )->cat_ID);
+
+	$categories = get_categories( array(
+    'orderby' => 'name',
+    'child_of'  => get_category_by_slug( $catSlug )->cat_ID
+	));
+
+	BugFu::Log($categories);
+ 
+	foreach ( $categories as $category ) {
+		$buffer = $buffer.'<li><a href="' . get_category_link( $category->term_id ) . '">' .  $category->name . '</a></li>';
+	}
+
+	$buffer = $buffer."</ul></div>";
+
+	BugFu::Log($buffer);
+
+	return $buffer;
+}
+
 function embed_posts_shortcode() {
 	
 	// Buffer variable
