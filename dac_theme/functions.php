@@ -188,6 +188,25 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
 
+add_shortcode('borderboxstart', 'borderboxstart_shortcode');
+
+function borderboxstart_shortcode($atts) {
+	
+	extract(shortcode_atts(array(
+		'class' => 'boo',
+	), $atts));
+
+	$s = "<div class='borderbox ".$class."'>";
+	return $s;
+}
+
+add_shortcode('borderboxend', 'borderboxend_shortcode');
+
+function borderboxend_shortcode() {
+	$s = "</div>";
+	return $s;
+}
+
 add_shortcode('show_categories', 'show_categories_shortcode');
 
 function show_categories_shortcode($atts) {
@@ -204,7 +223,8 @@ function show_categories_shortcode($atts) {
 
 	$categories = get_categories( array(
     'orderby' => 'name',
-    'parent'  => $catID
+		'parent'  => $catID,
+		'hide_empty'   => 0,
 	));
 
 	$buffer = $buffer.'<li><a href="' . get_category_link( $catID ) . '">' .  "All" . '</a></li>';
@@ -260,4 +280,10 @@ add_action('wp_enqueue_scripts', 'add_google_fonts');
 
 // require get_template_directory() . '/inc/populate-content.php';
 
+// add_filter('the_content', 'cleanup_shortcode_fix', 10);
+
+// remove mysterious <p> tags around shortcode (https://stackoverflow.com/questions/13510131)
+remove_filter( 'the_content', 'wpautop' );
+add_filter( 'the_content', 'wpautop', 99 );
+add_filter( 'the_content', 'shortcode_unautop', 100 );
 

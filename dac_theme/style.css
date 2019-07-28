@@ -395,7 +395,7 @@ input,
 select,
 optgroup,
 textarea {
-	color: #404040;
+	color: #43484C;
 	font-family: 'Karla', sans-serif;
 	font-size: 16px;
 	font-size: 1rem;
@@ -1105,10 +1105,10 @@ article p, article h1 {
 	padding-top: 1px;
 }
 
-.display-posts-listing {
+/* .display-posts-listing {
 	padding: 20px 30px;
 	border: 2px rgb(238, 238, 238) solid;
-}
+} */
 
 .display-posts-listing .title {
 	font-size: 1.25em;
@@ -1128,12 +1128,12 @@ article p, article h1 {
 	font-size: 0.75em;
 	padding: 2px;
 	text-transform: uppercase;
-
 }
 
 .display-posts-listing .category-display a:hover{
 	background-color: #fff;
 	color: #B23B96;
+	outline: 1px solid #B23B96; 
 }
 
 .display-posts-listing .content {
@@ -1142,6 +1142,12 @@ article p, article h1 {
 
 .display-posts-listing .content p{
 	padding-left: 0px;
+}
+
+
+
+.category-list {
+	margin-bottom: 10px;
 }
 
 .category-list ul {
@@ -1155,6 +1161,67 @@ article p, article h1 {
 	/* list-style-type: none; */
 }
 
+.category-list ul > li > a {
+	/* background-color: #B23B96; */
+	background-color: #B23B96;
+	color: #fff;
+	text-decoration: none;
+	font-size: 0.75em;
+	padding: 2px;
+	text-transform: uppercase;
+}
+
+.category-list ul > li > a:hover {
+	background-color: #fff;
+	color: #B23B96;
+	/* border: 1px solid #B23B96; */
+	/* box-sizing: border-box; */
+	outline: #B23B96 solid 1px;
+}
+
 /* .category-list ul>li{
 	display: inline;
 } */
+
+.borderbox{
+	/* outline: 2px solid #eee; */
+	outline: 2px solid #eee;
+	padding: 20px 30px;
+/* 
+	padding-left: 30px;
+	padding-right: 30px; */
+}
+
+.borderbox>h4:first-of-type {
+	padding-top: 0px;
+	margin-top: 0px;
+}
+
+.borderbox .display-posts-date {
+	background-color: rgb(238, 238, 238);
+}
+
+.wp-block-button>a:hover{
+	outline: #B23B96 1px solid;
+	color: #B23B96;
+	background-color: #fff !important;
+}
+
+h2 {
+	font-size: 46px;
+	/* text-decoration: underline #B23B96 solid; */
+	/* border: solid 2px #0070B8; */
+	/* border-left: solid 10px #0070B8; */
+	/* padding-left: 10px;  */
+	/* background-color: #eee;	 */
+	/* text-decoration: underline solid #43484C; */
+	/* border-bottom: 0.01em solid rgb(50, 50, 50); */
+	margin-bottom: 10px;
+}
+
+.borderbox {
+	max-height: 500px;
+	overflow-y: scroll;
+	/* box-shadow: inset 0px -5px 5px rgba(0, 0, 0, .5); */
+
+}
