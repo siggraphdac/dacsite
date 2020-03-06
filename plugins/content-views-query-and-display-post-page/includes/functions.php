@@ -340,7 +340,7 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 
 			// Remove entire tag content
 			$tags_to_rm	 = apply_filters( PT_CV_PREFIX_ . 'tag_to_remove', array( 'script', 'style' ) );
-			$string		 = preg_replace( array( '@<(' . implode( '|', $tags_to_rm ) . ')[^>]*?>.*?</\\1>@si' ), '', $string );
+			$string		 = preg_replace( array( '@<(' . implode( '|', $tags_to_rm ) . ')[^>]*(?>.*?</\\1>|/?>)@si' ), '', $string );
 
 			// Strip HTML tags
 			if ( apply_filters( PT_CV_PREFIX_ . 'strip_tags', 1 ) ) {
@@ -582,20 +582,6 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 		 */
 		static function array_get_first_key( $args ) {
 			return current( array_keys( (array) $args ) );
-		}
-
-		/**
-		 * Check valid request
-		 *
-		 * @param string $nonce_name  Name of nonce field
-		 * @param string $action_name name of action relates to nonce field
-		 */
-		static function _nonce_check( $nonce_name, $action_name ) {
-			$nonce_name = PT_CV_PREFIX_ . $nonce_name;
-			if ( !isset( $_POST[ $nonce_name ] ) || !wp_verify_nonce( $_POST[ $nonce_name ], PT_CV_PREFIX_ . $action_name ) ) {
-				_e( 'Cheatin&#8217; uh?' );
-				exit;
-			}
 		}
 
 		/**
@@ -1061,13 +1047,19 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 					$dargs[ 'pagination-settings' ][ 'style' ] = '';
 				}
 
-				$ppp = isset( $dargs[ 'pagination-settings' ][ 'items-per-page' ] ) ? (int) $dargs[ 'pagination-settings' ][ 'items-per-page' ] : $limit;
+				$ppp	 = $og_ppp	 = isset( $dargs[ 'pagination-settings' ][ 'items-per-page' ] ) ? (int) $dargs[ 'pagination-settings' ][ 'items-per-page' ] : $limit;
 				if ( $ppp > $limit ) {
 					$ppp = $limit;
 				}
 				$args[ 'posts_per_page' ] = $ppp;
 
-				$paged	 = (int) self::get_current_page( $pargs );
+				$paged = (int) self::get_current_page( $pargs );
+
+				// Prevent out of range pages show beyond posts
+				if ( $og_ppp && $paged > ceil( $limit / $og_ppp ) ) {
+					$paged = ceil( $limit / $og_ppp );
+				}
+
 				$offset	 = $ppp * ( $paged - 1 );
 				if ( intval( $args[ 'posts_per_page' ] ) > $limit - $offset ) {
 					$args[ 'posts_per_page' ] = $limit - $offset;
@@ -1099,7 +1091,9 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 				return;
 			}
 
-			PT_CV_Functions::_nonce_check( 'form_nonce', 'view_submit' );
+			if ( !isset( $_POST[ PT_CV_PREFIX_ . 'form_nonce' ] ) || !wp_verify_nonce( $_POST[ PT_CV_PREFIX_ . 'form_nonce' ], PT_CV_PREFIX_ . 'view_submit' ) ) {
+				return;
+			}
 
 			// Insert View
 			$title	 = cv_esc_sql( $_POST[ PT_CV_PREFIX . 'view-title' ] );
@@ -1113,7 +1107,7 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 			// Add/Update View data
 			$view_id = empty( $_POST[ PT_CV_PREFIX . 'view-id' ] ) ? PT_CV_Functions::string_random() : cv_sanitize_vid( $_POST[ PT_CV_PREFIX . 'view-id' ] );
 			update_post_meta( $post_id, PT_CV_META_ID, $view_id );
-			update_post_meta( $post_id, PT_CV_META_SETTINGS, $_POST );
+			update_post_meta( $post_id, PT_CV_META_SETTINGS, apply_filters( PT_CV_PREFIX_ . 'pre_save_view_data', $_POST ) );
 
 			// Update View title
 			if ( strpos( $title, '[ID:' ) === false ) {
@@ -1123,7 +1117,7 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 			$edit_link = PT_CV_Functions::view_link( $view_id );
 			?>
 			<script type="text/javascript">
-				window.location = '<?php echo $edit_link; ?>';
+				window.location = '<?php echo str_replace( '&#038;', '&', esc_url( $edit_link ) ); ?>';
 			</script>
 			<?php
 			exit;
@@ -1256,65 +1250,64 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 		 *
 		 * @param int $total_pages   Total pages
 		 * @param int $current_page  Current page number
-		 * @param int $pages_to_show Number of page to show
 		 */
-		static function pagination( $total_pages, $current_page = 1, $pages_to_show = 4 ) {
+		static function pagination_links( $total_pages, $current_page = 1 ) {
 			if ( $total_pages == 1 )
 				return '';
 
-			$pages_to_show	 = apply_filters( PT_CV_PREFIX_ . 'pages_to_show', $pages_to_show );
-			$labels			 = apply_filters( PT_CV_PREFIX_ . 'pagination_label', array(
-				'prev'	 => '&lsaquo;',
-				'next'	 => '&rsaquo;',
-				) );
+			$links = PT_CV_Functions::get_pagination_links( $current_page, $total_pages, 'array' );
 
-			$static_frontpage = (is_front_page() && !is_home());
-
-			global $wp_filter, $wp_rewrite;
-			$filters_bak = $wp_filter;
-			remove_all_filters( 'paginate_links' );
-			remove_all_filters( 'get_pagenum_link' );
-			add_filter( 'paginate_links', 'cv_comp_pagination_remove_old_param' );
-
-			$pb_bak						 = $wp_rewrite->pagination_base;
-			$wp_rewrite->pagination_base = $static_frontpage ? $pb_bak : PT_CV_PAGE_VAR;
-
-			$params = array(
-				'current'	 => $current_page,
-				'total'		 => $total_pages,
-				'type'		 => 'array',
-				'prev_text'	 => $labels[ 'prev' ],
-				'next_text'	 => $labels[ 'next' ],
-				'mid_size'	 => $pages_to_show ? intval( $pages_to_show ) / 2 : 2,
-			);
-			if ( !$wp_rewrite->using_permalinks() && !$static_frontpage ) {
-				$params[ 'format' ] = '?' . PT_CV_PAGE_VAR . '=%#%';
-			}
-
-			$links = paginate_links( $params );
-
-			$wp_filter					 = $filters_bak;
-			$wp_rewrite->pagination_base = $pb_bak;
-
+			// Generate the links
 			$html = '';
 			foreach ( $links as $link ) {
 				$class	 = strpos( $link, 'current' ) !== false ? 'class="active"' : '';
 				$link	 = preg_replace( '/<span[^>]*>/', '<a href="#">', $link );
 				$link	 = str_replace( '</span>', '</a>', $link );
 				$link	 = str_replace( array( 'page-numbers', 'prev', 'next' ), '', $link );
-
-				if ( get_query_var( 'paged' ) && !$static_frontpage && $wp_rewrite->using_permalinks() ) {
-					$link = preg_replace( "/\/page\/\d+/", '', $link );
-				}
-
 				$html .= "<li $class>" . $link . "</li>\n\t";
 			}
 
 			return $html;
 		}
 
-		/**
-		 * Get current page number
+		/** Remove pagination parameters from URL
+		 * @param string $link
+		 * @return string
+		 */
+		static function remove_pagination_params( $link ) {
+			$params = apply_filters( PT_CV_PREFIX_ . 'pagination_params_removed', array( 'vpage', 'page' ) );
+			return remove_query_arg( $params, $link );
+		}
+
+		/** Get general page number from an URL
+		 * @return int
+		 */
+		static function get_pagination_number() {
+			$paged = null;
+
+			// Get old params
+			foreach ( array( 'vpage', '_page' ) as $op ) {
+				if ( !empty( $_GET[ $op ] ) ) {
+					$paged = absint( $_GET[ $op ] );
+				}
+			}
+
+			// Get WP parameter
+			if ( !$paged ) {
+				if ( get_query_var( 'paged' ) ) {
+					$paged = get_query_var( 'paged' );
+				} elseif ( get_query_var( 'page' ) ) {
+					$paged = get_query_var( 'page' );
+				}
+			}
+
+			return $paged;
+		}
+
+		/** Get current page number of a View
+		 *
+		 * @param array $pargs Pagination settings of the View
+		 * @return int
 		 */
 		static function get_current_page( $pargs ) {
 			$paged = 1;
@@ -1323,8 +1316,8 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 				if ( !empty( $pargs[ 'page' ] ) ) {
 					$paged = absint( $pargs[ 'page' ] );
 				}
-				$pagenum = cv_comp_get_page_number();
-				if ( !empty( $pagenum ) && PT_CV_Functions::setting_value( PT_CV_PREFIX . 'pagination-type' ) === 'normal' ) {
+				$pagenum = self::get_pagination_number();
+				if ( !empty( $pagenum ) ) {
 					$paged = absint( $pagenum );
 				}
 			}
@@ -1346,10 +1339,80 @@ if ( !class_exists( 'PT_CV_Functions' ) ) {
 
 			if ( $dargs[ 'pagination-settings' ][ 'type' ] === 'normal' ) {
 				return true;
-			} else if ( $current_page === 1 ) {
-				return true;
+			} else if ( !(defined( 'DOING_AJAX' ) && DOING_AJAX && !empty( $_POST[ 'action' ] ) && $_POST[ 'action' ] == 'pagination_request') ) {
+                // Not requested by Ajax => show pagination
+                return true;
 			} else {
 				return false;
+			}
+		}
+
+		/** Get list of pagination links
+		 * @since 2.3.0
+		 *
+		 * @param int $current_page
+		 * @param int $total_pages
+		 * @param string $type
+		 * @return string/array
+		 */
+		static function get_pagination_links( $current_page = 1, $total_pages = 2, $type = 'array' ) {
+			// Custom filters
+			$pages_to_show	 = apply_filters( PT_CV_PREFIX_ . 'pages_to_show', 4 );
+			$labels			 = apply_filters( PT_CV_PREFIX_ . 'pagination_label', array(
+				'prev'	 => '&lsaquo;',
+				'next'	 => '&rsaquo;',
+			) );
+
+			// Call WP functions
+			global $wp_filter;
+			$filters_bak = $wp_filter;
+
+			remove_all_filters( 'paginate_links' );
+			remove_all_filters( 'get_pagenum_link' );
+			add_filter( 'paginate_links', array( __CLASS__, 'remove_pagination_params' ) );
+
+			$params = array(
+				'format'	 => apply_filters( PT_CV_PREFIX_ . 'pagination_link_format', '?_page=%#%' ),
+				'current'	 => $current_page,
+				'total'		 => $total_pages,
+				'type'		 => $type,
+				'prev_text'	 => $labels[ 'prev' ],
+				'next_text'	 => $labels[ 'next' ],
+				'mid_size'	 => $pages_to_show ? absint( $pages_to_show ) / 2 : 2,
+			);
+
+			$links = paginate_links( $params );
+
+			$wp_filter = $filters_bak;
+
+			return $links;
+		}
+
+		/** Get the link for a page number
+		 * @param int $page_num The page number
+		 * @since 2.3.0
+		 */
+		static function get_pagination_url( $page_num = 0 ) {
+			$links = self::get_pagination_links( 2, 3, 'list' );
+
+			$matches = array();
+			preg_match_all( '/href=["\']([^"\']+)["\']/', $links, $matches );
+
+			if ( !isset( $matches[ 1 ] ) ) {
+				return null;
+			} else {
+				$pattern = '@([/?&](page|paged|_page)[/=])([0-9]+)@i';
+				$page1	 = html_entity_decode( $matches[ 1 ][ 0 ] );
+				$pagen	 = html_entity_decode( $matches[ 1 ][ 3 ] );
+
+				if ( !empty( $page_num ) ) {
+					return esc_url_raw( preg_replace( $pattern, '${1}' . absint( $page_num ), $pagen ) );
+				} else {
+					return array(
+						'page_1' => esc_url_raw( $page1 ),
+						'page_n' => esc_url_raw( preg_replace( $pattern, '${1}' . '_CVNUMBER_', $pagen ) ),
+					);
+				}
 			}
 		}
 

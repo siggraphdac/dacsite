@@ -15,13 +15,19 @@ if ( !defined( 'ABSPATH' ) ) {
 $random_id		 = PT_CV_Functions::string_random();
 $heading		 = isset( $fields_html[ 'title' ] ) ? $fields_html[ 'title' ] : '';
 unset( $fields_html[ 'title' ] );
+
+// Get link
+$matches = array();
+preg_match( '/href="([^"]+)"/', $heading, $matches );
+$href	 = !empty( $matches[ 1 ] ) ? "href='" . esc_url( $matches[ 1 ] ) . "' onclick='event.preventDefault()'" : '';
 ?>
 
 <div class="panel-heading">
-	<a class="panel-title" data-toggle="cvcollapse" data-parent="#<?php echo esc_attr( PT_CV_PREFIX_UPPER . 'ID' ); ?>" href="#<?php echo esc_attr( $random_id ); ?>">
+    <a class="panel-title" data-toggle="cvcollapse" data-parent="#<?php echo esc_attr( PT_CV_PREFIX_UPPER . 'ID' ); ?>" data-target="#<?php echo esc_attr( $random_id ); ?>" <?php echo $href; ?>>
 		<?php
-		$allowable_tags	 = (array) apply_filters( PT_CV_PREFIX_ . 'collapsible_heading_tags', array( '<b>', '<br>', '<code>', '<em>', '<i>', '<img>', '<big>', '<small>', '<span>', '<strong>', '<sub>', '<sup>', '<label>', '<cite>', ) );
-		echo strip_tags( $heading, implode( '', $allowable_tags ) );
+		// Remove title wrapper and anchor tags, remain original post's title
+		$tt = tag_escape( PT_CV_Functions::setting_value( PT_CV_PREFIX . 'field-title-tag' ) );
+		echo preg_replace( array( '/<(' . $tt . '|a)[^>]*>/i', '/<\/(' . $tt . '|a)>/i' ), '', $heading );
 		?>
 	</a>
 	<?php

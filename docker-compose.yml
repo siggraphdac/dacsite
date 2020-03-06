@@ -1,18 +1,24 @@
-version: '3.1'
+version: '3.7'
 
 services:
 
   wordpress:
-    image: wordpress:5.2
+    depends_on: 
+      - mysql
+    image: wordpress:5.3
     volumes:
-      - ./wp_data:/var/www/html
-      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini 
-      - ./dac_theme:/var/www/html/wp-content/themes/dac_theme
-      - ./plugins:/var/www/html/wp-content/plugins
+      - ./wp_data:/var/www/html # Useful for seeing WP configs.
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini # Change upload limits.
+      - ./dac_theme:/var/www/html/wp-content/themes/dac_theme # Specicfic theme to be mapped.
+      - ./dacalt_theme:/var/www/html/wp-content/themes/dacalt_theme # Specicfic theme to be mapped.
+      - ./twentytwenty-dac:/var/www/html/wp-content/themes/twentytwenty-dac # Specicfic theme to be mapped.
+      - ./plugins:/var/www/html/wp-content/plugins # Plugins to include.
+    # command: chown -Rf 33:33 /var/www/html/wp-content && chmod -R a=r,u+w,a+X /var/www/html/wp-content
     ports:
       - 8082:80
     environment:
       WORDPRESS_DB_PASSWORD: example
+      APACHE_RUN_USER: "#33" # Helps with persmissions issue and mapping volumes.
 
   mysql:
     image: mysql:5.7

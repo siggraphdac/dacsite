@@ -354,7 +354,7 @@ class PT_Content_Views_Admin {
 			// Get View id
 			$view_id = get_post_meta( $post_id, PT_CV_META_ID, true );
 
-			printf( '<input style="width: 200px; background: #ADFFAD;" type="text" value="[pt_view id=&quot;%s&quot;]" onclick="this.select()" readonly="">', $view_id );
+			printf( '<input style="width: 200px; background: #ADFFAD;" type="text" value="[pt_view id=&quot;%s&quot;]" onclick="this.select()" readonly="">', cv_sanitize_vid( $view_id ) );
 		}
 	}
 

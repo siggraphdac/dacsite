@@ -82,7 +82,7 @@ if ( !class_exists( 'PT_CV_Values' ) ) {
 			$taxonomies	 = get_taxonomies( $args, 'objects' );
 
 			foreach ( $taxonomies as $taxonomy ) {
-				$result[ $taxonomy->name ] = $taxonomy->labels->singular_name;
+				$result[ $taxonomy->name ] = !empty( $taxonomy->label ) ? $taxonomy->label : $taxonomy->labels->singular_name;
 			}
 
 			return apply_filters( PT_CV_PREFIX_ . 'tax_list', $result );
@@ -264,6 +264,7 @@ if ( !class_exists( 'PT_CV_Values' ) ) {
 					'fields'	 => array( 'ID', $show, 'user_login' ),
 					'orderby'	 => 'display_name',
 					'order'		 => 'ASC',
+					'number'     => 1000,
 				);
 
 				$users = get_users( apply_filters( PT_CV_PREFIX_ . 'user_list', $args ) );

@@ -81,7 +81,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 			<div class="panel panel-primary pt-accordion">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a class="pt-accordion-a" data-parent="#<?php echo esc_attr( $parent_id ); ?>" href="#<?php echo esc_attr( $id ); ?>">
+						<a class="pt-accordion-a" data-parent="#<?php echo esc_attr( $parent_id ); ?>" data-target="#<?php echo esc_attr( $id ); ?>">
 							<?php echo $heading; ?>
 						</a>
 					</h4>
@@ -172,6 +172,9 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 				return $content;
 			}
 
+			// Sanitize view_type
+			$view_type = preg_replace( '/[^a-z0-9_\-]/', '', $view_type );
+
 			// Get view type directory
 			$view_type_dir	 = apply_filters( PT_CV_PREFIX_ . 'view_type_dir', PT_CV_VIEW_TYPE_OUTPUT, $view_type ) . $view_type;
 			// Compatible code for other Pro versions
@@ -246,7 +249,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 			do_action( PT_CV_PREFIX_ . 'item_extra_html', $post_id );
 			$html_item .= ob_get_clean();
 
-			$result = sprintf( '<div class="%s" %s>%s</div>', esc_attr( implode( ' ', $item_class ) ), cv_sanitize_html_data( $item_filter ), force_balance_tags( $html_item ) );
+			$result = sprintf( '<div class="%s" %s>%s</div>', esc_attr( implode( ' ', $item_class ) ), cv_sanitize_html_data( $item_filter ), $html_item );
 			return apply_filters( PT_CV_PREFIX_ . 'item_final_html', $result, $post_id );
 		}
 
@@ -420,6 +423,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 			$content_class	 = apply_filters( PT_CV_PREFIX_ . 'field_content_class', PT_CV_PREFIX . 'content' );
 			$tag			 = apply_filters( PT_CV_PREFIX_ . 'field_content_tag', 'div' );
 			$content		 = '';
+			$balance_tags	 = true;
 
 			switch ( $fargs[ 'content' ][ 'show' ] ) {
 				case 'excerpt':
@@ -463,11 +467,15 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 					$content = ob_get_clean();
 					$content = apply_filters( PT_CV_PREFIX_ . 'field_content_full', $content, $fargs, $post );
 
+					if ( !empty( $fargs[ 'content' ][ 'skip-balance-tag' ] ) ) {
+						$balance_tags = false;
+					}
+
 					break;
 			}
 
 			$content = apply_filters( PT_CV_PREFIX_ . 'field_content_final', $content, $post );
-			$html	 = rtrim( $content, '.' ) ? sprintf( '<%1$s class="%2$s">%3$s</%1$s>', tag_escape( $tag ), esc_attr( $content_class ), force_balance_tags( $content ) ) : '';
+			$html	 = rtrim( $content, '.' ) ? sprintf( '<%1$s class="%2$s">%3$s</%1$s>', tag_escape( $tag ), esc_attr( $content_class ), $balance_tags ? force_balance_tags( $content ) : $content ) : '';
 
 			return $html;
 		}
@@ -662,6 +670,8 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 				return '';
 			}
 
+			add_action( 'wp_print_footer_scripts', array( __CLASS__, 'show_link_variables' ) );
+
 			global $cv_unique_id;
 			$dargs			 = PT_CV_Functions::get_global_variable( 'dargs' );
 			$pagination_btn	 = '';
@@ -670,7 +680,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 
 			if ( $type == 'normal' || $style == 'regular' ) {
 				$ul_class		 = implode( ' ', array( PT_CV_PREFIX . 'pagination', PT_CV_PREFIX . $type, 'pagination' ) );
-				$pagination_btn	 = sprintf( '<ul class="%s" data-totalpages="%s" data-currentpage="%s" data-sid="%s" data-unid="%s">%s</ul>', $ul_class, esc_attr( $max_num_pages ), esc_attr( $current_page ), esc_attr( $sid ), esc_attr( $cv_unique_id ), ($type == 'normal') ? PT_CV_Functions::pagination( $max_num_pages, $current_page ) : '<li></li>'  );
+				$pagination_btn	 = sprintf( '<ul class="%s" data-totalpages="%s" data-currentpage="%s" data-sid="%s" data-unid="%s">%s</ul>', $ul_class, esc_attr( $max_num_pages ), esc_attr( $current_page ), esc_attr( $sid ), esc_attr( $cv_unique_id ), PT_CV_Functions::pagination_links( $max_num_pages, $current_page ) );
 			} else {
 				$pagination_btn = apply_filters( PT_CV_PREFIX_ . 'btn_more_html', $pagination_btn, $max_num_pages, $sid );
 			}
@@ -864,6 +874,18 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 				$result = ucwords( rtrim( __( 'Read more...' ), '.' ) );
 			}
 			return $result;
+		}
+
+		/**
+		 * @since 2.3.2
+		 */
+		static function show_link_variables() {
+			// Only need to run one time per page
+			remove_action( 'wp_print_footer_scripts', array( __CLASS__, 'show_link_variables' ) );
+
+			$links = wp_json_encode( PT_CV_Functions::get_pagination_url() );
+			echo "<script id='" . PT_CV_PREFIX . "append-scripts'>if( PT_CV_PAGINATION ) { PT_CV_PAGINATION.links = $links; }
+            </script>";
 		}
 
 	}

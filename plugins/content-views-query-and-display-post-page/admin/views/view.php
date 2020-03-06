@@ -232,6 +232,18 @@ PT_CV_Functions::view_submit();
 											),
 										),
 									),
+									array(
+										'label'		 => array(
+											'text' => '',
+										),
+										'params'	 => array(
+											array(
+												'type'		 => 'html',
+												'content'	 => sprintf( '<p class="alert-warning" style="margin-top:-10px;padding:0;">%s</p>', __( 'Leaving it empty might cause performance issues. You should enable pagination (on the next tab) in this case.', 'content-views-query-and-display-post-page' ) ),
+											),
+										),
+										'dependence' => array( 'limit', '' ),
+									),
 									apply_filters( PT_CV_PREFIX_ . 'after_limit_option', '' ),
 								),
 							),

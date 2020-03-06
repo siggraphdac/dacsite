@@ -278,10 +278,10 @@ if ( !class_exists( 'PT_CV_Html_ViewType' ) ) {
 			$output = '';
 			if ( $count_slides > 1 ) {
 				$output = sprintf(
-					'<a class="left carousel-control" href="#%1$s" data-cvslide="prev">
+					'<a class="left carousel-control" data-target="#%1$s" data-cvslide="prev">
 						<span class="glyphicon glyphicon-chevron-left"></span>
 					</a>
-					<a class="right carousel-control" href="#%1$s" data-cvslide="next">
+					<a class="right carousel-control" data-target="#%1$s" data-cvslide="next">
 						<span class="glyphicon glyphicon-chevron-right"></span>
 					</a>', esc_attr( $wrapper_id )
 				);

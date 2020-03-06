@@ -20,6 +20,15 @@ if ( $stored_version ) {
 		update_option( PT_CV_OPTION_VERSION, PT_CV_VERSION );
 	}
 
+	// Delete deprecated post meta
+	if ( version_compare( $stored_version, '2.3.2', '<' ) && cv_is_active_plugin( 'cornerstone' ) ) {
+		global $wpdb;
+		$wpdb->query(
+			"DELETE FROM $wpdb->postmeta WHERE meta_key = 'cv_comp_cornerstone_content'"
+		);
+	}
+
+	// Delete deprecated option
 	if ( version_compare( $stored_version, '2.1.2', '<' ) ) {
 		delete_option( 'cv_pretty_pagination_url' );
 	}

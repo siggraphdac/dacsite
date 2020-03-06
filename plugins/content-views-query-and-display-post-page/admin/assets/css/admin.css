@@ -22,6 +22,7 @@
 	height: 34px;
 }
 body {background-color: #fff}
+.pt-params .select2-input {line-height: 20px;} /* WP 5.3 */
 
 /* Fix Bootstrap box-sizing "border-box" problem */
 .pt-wrap *,
@@ -305,6 +306,11 @@ html {
 
 .pt-cv-excerpt-setting > .pt-params  > .pt-form-group {
 	background: #fff;
+}
+
+.pt-cv-content-setting > .pt-params,
+.pt-cv-content-setting + .pt-cv-excerpt-setting > .pt-params {
+	border-bottom: none !important;
 }
 
 .pt-cv-excerpt-setting > label {

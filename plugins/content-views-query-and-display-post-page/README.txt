@@ -3,8 +3,8 @@ Contributors: pt-guy
 Donate link: https://www.contentviewspro.com/?utm_source=wordpress&utm_medium=plugin&utm_campaign=donate
 Tags: post grid, grid plugin, grid, latest post, display post, post, page, category, responsive, list, thumbnail
 Requires at least: 3.3
-Tested up to: 5.2.1
-Stable tag: 2.2.0
+Tested up to: 5.3.2
+Stable tag: 2.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -158,6 +158,20 @@ If you are using "Your latest posts" as home page, you should paste this code `<
 
 
 == Changelog ==
+
+= 2.3.2 - 2020/02/21 =
+* Update: Better solutions to fix some compatibility issues
+
+= 2.3.1 - 2020/01/21 =
+* Compatibility: Avoid issue caused by a hide post plugin (which modifies query without proper checking)
+* Fix: Fix text output issue in a layout
+
+= 2.3.0 - 2020/01/13 =
+* Update: Improve SEO for Ajax pagination: relace the format `/pages/` (as it caused some issues) by `_page=`; make each component pages accessible individually.
+* Update: Add link to title in the Collapsible list
+* Update: Show original post title in Collapsible list without stripping HTML tags as previous versions
+* New: Add option to show original full content without attempt to balance HTML tags
+* Some minor updates and fixes
 
 = 2.2.0 - 2019/05/31 =
 * Enhancement: upgrade bootstrap framework to latest secure version 3.4.1

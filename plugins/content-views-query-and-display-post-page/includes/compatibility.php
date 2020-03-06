@@ -57,62 +57,36 @@ function cv_comp_plugin_autoptimize( $defer ) {
 	return $defer;
 }
 
-/**
- * Page Builder by SiteOrigin
- * Excerpt is incorrect (not updated)
- * @update 1.9.9 Apply the "the_content" to work with any verion of that plugin
- * @since 1.8.8
+/** Get full content in some cases
+ * @since 2.3.2
  */
-add_filter( 'pt_cv_field_content_excerpt', 'cv_comp_plugin_siteoriginbuilder', 9, 3 );
-function cv_comp_plugin_siteoriginbuilder( $args, $fargs, $this_post ) {
-
-	if ( defined( 'SITEORIGIN_PANELS_VERSION' ) ) {
-		if ( !isset( $this_post->cv_so_content ) ) {
-			$this_post->cv_so_content = apply_filters( 'the_content', $args );
+add_filter( 'pt_cv_field_content_excerpt', 'cv_comp_get_full_content', 9, 3 );
+function cv_comp_get_full_content( $content, $fargs, $this_post ) {
+	/** Get content of current language
+	 * qTranslate-X (and qTranslate, mqTranslate)
+	 * @since 1.7.8
+	 */
+	/** Page Builder by SiteOrigin
+	 * Excerpt is incorrect (not updated)
+	 * @update 1.9.9 Apply the "the_content" to work with any verion of that plugin
+	 * @since 1.8.8
+	 */
+	/**
+	 * Cornerstone Page Builder
+	 * Excerpt/thumbnal is incorrect (can't get)
+	 * @since 2.0
+	 */
+	if ( function_exists( 'qtranxf_use' ) || defined( 'SITEORIGIN_PANELS_VERSION' ) || cv_is_active_plugin( 'cornerstone' ) ) {
+		if ( !isset( $this_post->cv_full_content ) ) {
+			ob_start();
+			the_content();
+			$this_post->cv_full_content = ob_get_clean();
 		}
 
-		$args = $this_post->cv_so_content;
-	}
-
-	return $args;
-}
-
-/**
- * Cornerstone Page Builder
- * Excerpt/thumbnal is incorrect (can't get)
- * @since 2.0
- */
-add_filter( 'the_content', 'cv_comp_plugin_cornerstone_single', PHP_INT_MAX );
-function cv_comp_plugin_cornerstone_single( $content ) {
-	if ( isset( $_REQUEST[ 'cv_comp_cs_content' ] ) ) {
-		// Save the content, which is already processed by Cornerstone
-		update_post_meta( get_the_ID(), 'cv_comp_cornerstone_content', array(
-			'expires'	 => time() + DAY_IN_SECONDS,
-			'data'		 => $content,
-		) );
+		$content = $this_post->cv_full_content;
 	}
 
 	return $content;
-}
-
-add_filter( 'pt_cv_field_content_excerpt', 'cv_comp_plugin_cornerstone_core', 9, 3 );
-add_filter( 'pt_cv_field_content_full', 'cv_comp_plugin_cornerstone_core', 9, 3 );
-function cv_comp_plugin_cornerstone_core( $args, $fargs, $this_post ) {
-	if ( cv_is_active_plugin( 'cornerstone' ) ) {
-		$cache = $this_post->cv_comp_cornerstone_content;
-		if ( empty( $cache ) || ( isset( $cache[ 'expires' ] ) && $cache[ 'expires' ] < time() ) ) {
-			// Simulate the frontend, to get processed output by Cornerstone
-			@file_get_contents( add_query_arg( 'cv_comp_cs_content', 1, get_permalink( $this_post->ID ) ) );
-			// Get the processed content
-			$cache = get_post_meta( $this_post->ID, 'cv_comp_cornerstone_content', true );
-		}
-
-		if ( isset( $cache[ 'data' ] ) ) {
-			$args = $cache[ 'data' ];
-		}
-	}
-
-	return $args;
 }
 
 // Prevent error "The preview was unresponsive after loading"
@@ -247,17 +221,36 @@ function cv_comp_wrong_sortby( $query ) {
 /**
  * OptimizePress plugin
  * Content Views style & script were not loaded in page created by OptimizePress plugin
- * @since 1.9.8
+ * @since 1.9.8, update 2.3.2
  */
-if ( function_exists( 'opRemoveScripts' ) ) {
-	remove_action( 'wp_print_scripts', 'opRemoveScripts', 10 );
-}
-if ( function_exists( 'opRemoveStyles' ) ) {
-	remove_action( 'wp_print_styles', 'opRemoveStyles', 10 );
+if ( cv_is_active_plugin( 'optimizePressPlugin' ) ) {
+	add_action( 'wp_print_styles', 'cv_comp_plugin_optimize', 9 );
+	function cv_comp_plugin_optimize() {
+		$oep = get_option( 'opd_external_plugins', array() );
+		foreach ( array( 'css', 'js' ) as $key ) {
+			if ( !isset( $oep[ $key ] ) ) {
+				$oep[ $key ] = array();
+			}
+			$oep[ $key ][]	 = 'content-views-query-and-display-post-page';
+			$oep[ $key ][]	 = 'pt-content-views-pro';
+		}
+		update_option( 'opd_external_plugins', $oep );
+	}
+
 }
 
 add_action( PT_CV_PREFIX_ . 'before_query', 'cv_comp_action_before_query' );
 function cv_comp_action_before_query() {
+	/** Fix problem with Paid Membership Pro plugin
+	 * It resets (instead of append) "post__not_in" parameter of WP query which makes:
+	 * - exclude function doesn't work
+	 * - output in Preview panel is different from output in front-end
+	 * @since 1.7.3
+	 */
+	if ( function_exists( 'pmpro_search_filter' ) ) {
+		remove_filter( 'pre_get_posts', 'pmpro_search_filter' );
+	}
+
 	/* Fix: Posts don't appear in View output, when excludes categories by "Ultimate category excluder" plugin
 	 * @since 1.9.9
 	 */
@@ -271,6 +264,12 @@ function cv_comp_action_before_query() {
 	if ( function_exists( 'rc_modify_query_get_posts_by_date' ) ) {
 		remove_action( 'pre_get_posts', 'rc_modify_query_get_posts_by_date' );
 	}
+
+	/* Theme GeoPress360 shows only post and its post type on all pages
+	 * @since 2.3.0
+	 */
+	remove_filter( 'pre_get_posts', 'aplotis_custom_posts_in_archive' );
+	remove_filter( 'pre_get_posts', 'aplotis_panoramas_in_home_loop' );
 }
 
 /**
@@ -347,81 +346,87 @@ function cv_comp_plugin_saoe() {
 /** Compatible with Timeline layout which uses old param
  * @since 2.0
  */
-add_action( PT_CV_PREFIX_ . 'view_process_start', 'cv_comp_pro_timeline' );
-function cv_comp_pro_timeline() {
-	$pagenum = cv_comp_get_page_number();
+add_action( PT_CV_PREFIX_ . 'view_process_start', 'cv_comp_pro_timeline_pagination' );
+function cv_comp_pro_timeline_pagination() {
+	$pagenum = PT_CV_Functions::get_pagination_number();
 	if ( !empty( $pagenum ) ) {
 		$_GET[ 'vpage' ] = $pagenum;
 	}
 }
 
-/** Get the page number for Normal pagination
- *
- * @return type
+/** Redirect to new url if using old pagination link
+  /pages/N
+  ?pages=N
+  &pages=N
+ * @since 2.3.0
  */
-function cv_comp_get_page_number() {
-	$paged = null;
+add_action( 'template_redirect', 'cv_comp_pagination_redirect' );
+function cv_comp_pagination_redirect() {
+	$matches = array();
+	$pattern = '@([/?&]pages[/=])([0-9]+)@i';
+	$request = html_entity_decode( get_pagenum_link() );
+	preg_match( $pattern, $request, $matches );
 
-	// Get old params
-	foreach ( array( 'vpage', '_page' ) as $op ) {
-		if ( !empty( $_GET[ $op ] ) ) {
-			$paged = absint( $_GET[ $op ] );
+	if ( !empty( $matches[ 2 ] ) ) {
+		$new_url_raw = PT_CV_Functions::get_pagination_url( $matches[ 2 ] );
+		$new_url	 = preg_replace( $pattern, '', html_entity_decode( $new_url_raw ) );
+		if ( !headers_sent() && wp_http_validate_url( $new_url ) ) {
+			wp_safe_redirect( $new_url, 301 );
+			exit();
+		} else {
+			return $new_url;
 		}
 	}
-
-	if ( !$paged ) {
-		$paged = get_query_var( PT_CV_PAGE_VAR );
-	}
-	// Static front page
-	if ( !$paged ) {
-		$paged = get_query_var( 'page' );
-	}
-
-	return $paged;
 }
 
-function cv_comp_pagination_remove_old_param( $link ) {
-	$link = remove_query_arg( array( 'vpage', '_page', 'page' ), $link );
-
-	// Visit /?pagevar=N, pagination links wrong
-	global $wp_rewrite;
-	if ( $wp_rewrite->using_permalinks() ) {
-		$link = remove_query_arg( PT_CV_PAGE_VAR, $link );
-	}
-
-	return $link;
-}
-
-// Make pagination endpoint works with "custom taxonomy"
-add_filter( 'register_taxonomy_args', 'cv_add_mask_to_custom_taxonomy', 10, 3 );
-function cv_add_mask_to_custom_taxonomy( $args, $name, $object_type ) {
-	$args = array_merge( array(
-		'rewrite' => true,
-		), $args );
-
-	if ( false !== $args[ 'rewrite' ] && ( is_admin() || '' != get_option( 'permalink_structure' ) ) ) {
-		$args[ 'rewrite' ] = wp_parse_args( $args[ 'rewrite' ], array(
-			'ep_mask' => EP_ALL,
-			) );
-	}
-
-	return $args;
-}
-
-// Register pagination endpoint
-add_action( 'init', 'cv_pretty_nonajax_pagination', 999999 );
-function cv_pretty_nonajax_pagination() {
-	add_rewrite_endpoint( PT_CV_PAGE_VAR, EP_ALL );
-
-	if ( false === get_option( 'cv_pretty_pagination_url_212' ) ) {
-		flush_rewrite_rules( false );
-		add_option( 'cv_pretty_pagination_url_212', 1 );
-	}
-}
-
-/** Prevent (no title) issue caused by other plugins */
-add_action( PT_CV_PREFIX_ . 'view_process_start', 'cv_comp_prevent_no_title' );
-function cv_comp_prevent_no_title() {
-	// title-remover plugin
+/** Prevent issue caused by other plugins */
+add_action( PT_CV_PREFIX_ . 'view_process_start', 'cv_comp_ps_prevent_other_plugins' );
+function cv_comp_ps_prevent_other_plugins() {
+	// title-remover plugin: cause (no title)
 	remove_filter( 'the_title', 'wptr_supress_title', 10, 2 );
+
+	// Easy Custom Auto Excerpt: cause no featured image found
+	if ( isset( $GLOBALS[ 'ECAE_The_Post' ] ) ) {
+		remove_filter( 'get_post_metadata', array( $GLOBALS[ 'ECAE_The_Post' ], 'get_post_metadata' ), 10, 4 );
+	}
+}
+
+/** Prevent output of Easy Footnotes plugin from showing in View (which shows Full Content of post) 
+ * @since 2.3.0
+ */
+add_action( 'pt_cv_view_process_start', 'cvp_comp_plugin_easyfootnotes' );
+function cvp_comp_plugin_easyfootnotes() {
+	global $easyFootnotes;
+	if ( isset( $easyFootnotes ) ) {
+		$is_start	 = current_filter() === 'pt_cv_view_process_start';
+		$func		 = $is_start ? 'remove_filter' : 'add_filter';
+
+		$func( 'the_content', array( $easyFootnotes, 'easy_footnote_after_content' ), 20 );
+		$func( 'the_content', array( $easyFootnotes, 'easy_footnote_reset' ), 999 );
+
+		if ( $is_start ) {
+			add_action( 'pt_cv_view_process_end', 'cvp_comp_plugin_easyfootnotes' );
+		}
+	}
+}
+
+/** Prevent "whp-hide-posts" from causing multiple views on same page show same output
+ * @since 2.3.1
+ */
+add_action( 'pre_get_posts', 'cv_comp_plugin_wph', 1 );
+function cv_comp_plugin_wph( $query ) {
+	$hook		 = 'pre_get_posts';
+	$class		 = 'WHP_Post_Hide';
+	$priority	 = 10;
+	if ( $query->get( 'cv_get_view' ) && class_exists( $class ) && !empty( $GLOBALS[ 'wp_filter' ][ $hook ][ $priority ] ) ) {
+		$arr = (array) $GLOBALS[ 'wp_filter' ][ $hook ][ $priority ];
+		foreach ( array_keys( $arr ) as $filter ) {
+            if ( strpos( $filter, 'exclude_posts' ) !== false ) {
+                if ( !empty( $arr[ $filter ][ 'function' ][ 0 ] ) && is_a( $arr[ $filter ][ 'function' ][ 0 ], $class ) ) {
+					remove_filter( $hook, $filter, $priority );
+				}
+			}
+        }
+    }
+	return $query;
 }

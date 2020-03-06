@@ -42,8 +42,6 @@ define( 'PT_CV_VIEW_TYPE_OUTPUT', PT_CV_PATH . 'public/templates/' );
 // Enable/Disable debug mode
 define( 'PT_CV_DEBUG', false );
 
-// Name of parameter for non-ajax pagination
-define( 'PT_CV_PAGE_VAR', 'pages' );
 /**
  * Check if CV layout was damaged by theme/another plugin's style
  * @since 1.8.7

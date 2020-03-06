@@ -553,25 +553,8 @@
 		 * @returns {undefined}
 		 */
 		_thumbnail_settings: function () {
-			// Toggle 'Thumbnail settings' when change 'Layout format'
-			var fn_thumbnail_setting = function ( this_val ) {
-				var $show_thumbnail = $( '[name="' + _prefix + 'show-field-thumbnail' + '"]' );
-
-				// Force to show thumbnail IF it is not enabled
-				if ( this_val === '2-col' && !$show_thumbnail.is( ':checked' ) ) {
-					$show_thumbnail.trigger( 'click' );
-				}
-			};
 
 			var layout_format = '[name="' + _prefix + 'layout-format' + '"]';
-
-			// Run on page load
-			fn_thumbnail_setting( $( layout_format + ':checked' ).val() );
-
-			// Run on change
-			$( layout_format ).change( function () {
-				fn_thumbnail_setting( $( layout_format + ':checked' ).val() );
-			} );
 
 			/**
 			 * Toggle 'Layout format' when change 'View type'

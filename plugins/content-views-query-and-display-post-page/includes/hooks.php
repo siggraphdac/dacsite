@@ -24,7 +24,6 @@ if ( !class_exists( 'PT_CV_Hooks' ) ) {
 		 */
 		static function init() {
 			add_filter( PT_CV_PREFIX_ . 'validate_settings', array( __CLASS__, 'filter_validate_settings' ), 10, 2 );
-			add_filter( PT_CV_PREFIX_ . 'field_content_excerpt', array( __CLASS__, 'filter_field_content_excerpt' ), 9, 3 );
 			add_filter( PT_CV_PREFIX_ . 'item_col_class', array( __CLASS__, 'filter_item_col_class' ), 20, 2 );
 			add_filter( PT_CV_PREFIX_ . 'fields_html', array( __CLASS__, 'filter_fields_html' ), 20, 2 );
 
@@ -40,7 +39,6 @@ if ( !class_exists( 'PT_CV_Hooks' ) ) {
 			add_filter( 'wp_get_attachment_image_attributes', array( __CLASS__, 'filter_disable_wp_responsive_image' ), 1000, 3 );
 
 			// Do action
-			add_action( PT_CV_PREFIX_ . 'before_query', array( __CLASS__, 'action_before_query' ) );
 			add_action( PT_CV_PREFIX_ . 'before_process_item', array( __CLASS__, 'action_before_process_item' ) );
 			add_action( PT_CV_PREFIX_ . 'after_process_item', array( __CLASS__, 'action_after_process_item' ) );
 			add_action( PT_CV_PREFIX_ . 'before_content', array( __CLASS__, 'action_before_content' ) );
@@ -103,27 +101,6 @@ if ( !class_exists( 'PT_CV_Hooks' ) ) {
 			}
 
 			return array_filter( $errors );
-		}
-
-		/**
-		 * Filter content before generating excerpt
-		 *
-		 * @param type $args
-		 * @param type $fargs
-		 * @param type $post
-		 */
-		public static function filter_field_content_excerpt( $args, $fargs, $post ) {
-			/**
-			 * Get content of current language
-			 * qTranslate-X (and qTranslate, mqTranslate)
-			 * @since 1.7.8
-			 */
-			if ( function_exists( 'qtranxf_use' ) ) {
-				global $q_config;
-				$args = qtranxf_use( $q_config[ 'language' ], $args );
-			}
-
-			return $args;
 		}
 
 		/**
@@ -260,17 +237,6 @@ if ( !class_exists( 'PT_CV_Hooks' ) ) {
 			}
 
 			return $args;
-		}
-
-		public static function action_before_query() {
-			/** Fix problem with Paid Membership Pro plugin
-			 * It resets (instead of append) "post__not_in" parameter of WP query which makes:
-			 * - exclude function doesn't work
-			 * - output in Preview panel is different from output in front-end
-			 */
-			if ( function_exists( 'pmpro_search_filter' ) ) {
-				remove_filter( 'pre_get_posts', 'pmpro_search_filter' );
-			}
 		}
 
 		public static function action_before_process_item() {

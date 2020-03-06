@@ -352,6 +352,46 @@ if ( !class_exists( 'PT_CV_Settings' ) ) {
 					),
 					'dependence'	 => array( $prefix2 . 'content', 'yes' ),
 				),
+				// Full content (use same group class to use existing js + css)
+				array(
+					'label'			 => array(
+						'text' => '',
+					),
+					'extra_setting'	 => array(
+						'params' => array(
+							'width'			 => 12,
+							'group-class'	 => PT_CV_PREFIX . 'field-setting' . ' ' . PT_CV_PREFIX . 'excerpt-setting',
+						),
+					),
+					'params'		 => array(
+						array(
+							'type'	 => 'group',
+							'params' => array(
+								array(
+									'label'			 => array(
+										'text' => '',
+									),
+									'extra_setting'	 => array(
+										'params' => array(
+											'width' => 12,
+										),
+									),
+									'params'		 => array(
+										array(
+											'type'		 => 'checkbox',
+											'name'		 => $prefix . 'content-skip-balance-tag',
+											'options'	 => PT_CV_Values::yes_no( 'yes', __( 'Do not attempt to balance HTML tags in content', 'content-views-query-and-display-post-page' ) ),
+											'std'		 => '',
+											'desc'		 => __( 'Balancing tag prevents unmatched elements. But it does not work for all cases.<br> Check this option to show original content', 'content-views-query-and-display-post-page' ),
+										),
+									),
+									'dependence'	 => array( $prefix . 'content-show', 'full' ),
+								),
+							),
+						),
+					),
+					'dependence'	 => array( $prefix2 . 'content', 'yes' ),
+				),
 				// Excerpt settings
 				array(
 					'label'			 => array(
@@ -651,7 +691,7 @@ if ( !class_exists( 'PT_CV_Settings' ) ) {
 							'name'		 => $prefix . 'thumbnail-nowprpi',
 							'options'	 => PT_CV_Values::yes_no( 'yes', __( 'Disable responsive image of WordPress', 'content-views-query-and-display-post-page' ) ),
 							'std'		 => '',
-							'desc'		 => __( 'Check this option if thumbnail looks blurry', 'content-views-query-and-display-post-page' ),
+							'desc'		 => __( 'If thumbnail looks blurry, check this option, and select a bigger size option above', 'content-views-query-and-display-post-page' ),
 						),
 					),
 				),
