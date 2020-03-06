@@ -2,7 +2,7 @@
   "name": "wp-docker-dev",
   "version": "1.0.0",
   "scripts": {
-    "start": "rm -r wp_data/* && docker-compose up",
-    "startFresh": "docker container stop dacsite_wordpress_1 dacsite_mysql_1 || true && docker container rm dacsite_wordpress_1 dacsite_mysql_1 || true && docker volume rm dacsite_db_data || true && rm -r ./wp_data/* && docker-compose up"
+    "start": "./npm-start.sh",
+    "startFresh": "./npm-startFresh.sh"
   }
 }
